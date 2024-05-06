@@ -1,0 +1,56 @@
+.headerStyle{
+    background-color: #29335C;
+}
+
+
+.videoCallWrapper{
+    display: "flex";
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.streamsWrapper{
+    display: "flex";
+    flex-direction: column;
+    width: 800px;
+    justify-content: space-between;
+}
+.myStreamBox{
+    width: 250px;
+    height: 189px;
+    border-radius: 15px;
+    border-color: #29335C;
+    border-width: 3px;
+    display: "flex";
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.partnerStreamBox{
+    width: 800px;
+    border-radius: 15px;
+    border-color: #29335C;
+    border-width: 3px;
+}
+.missingParterStreamBox{
+    width: 800px;
+    height:600px;
+    border-radius: 15px;
+    border-color: #29335C;
+    border-width: 3px;
+
+}
+
+.writePrescription{
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+    margin-top: 30px;
+}
+.inputsWrapper{
+    display: flex;
+    flex-direction: row;
+    height: 45px;
+    margin-top: 30px;
+    gap: 10px;
+}
