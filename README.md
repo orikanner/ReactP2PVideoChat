@@ -1,4 +1,4 @@
-This project is a simple demonstration of peer-to-peer (P2P) communication using React and Socket.IO. The primary aim is to explore the capabilities and implementation of P2P video chat functionalities in a web application. By integrating Socket.IO, this project facilitates real-time, direct video connections between users, leveraging the power of WebSockets for instant communication.
+This project is a simple demonstration of peer-to-peer (P2P) communication using React and Socket.IO. The primary aim is to explore the capabilities and implementation of P2P video chat functionalities in a web application.
 
 
 This repository serves as a practical learning tool for understanding the basics of P2P communication in modern web development.
