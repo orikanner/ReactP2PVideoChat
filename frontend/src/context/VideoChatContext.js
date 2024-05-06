@@ -30,7 +30,7 @@ const VideoChatProvider = ({ children }) => {
   const userVideo = useRef();
 
   const connectionRef = useRef();
-  console.log("connectionRef",connectionRef)
+  console.log("connectionRef", connectionRef);
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -46,9 +46,6 @@ const VideoChatProvider = ({ children }) => {
 
     if (currentUser && currentUser.isVet) {
       socket.emit("registerVet", { token: currentUserToken });
-      // socket.on("confirmReg", (d) => {
-      //   console.log(d);
-      // });
       socket.on("callFromClient", (data) => {
         console.log("callFromClient", data);
         setIsReceivingCall(true);
@@ -94,10 +91,9 @@ const VideoChatProvider = ({ children }) => {
     try {
       const peer = new Peer({ initiator: true, trickle: false, stream });
       peer.on("signal", (data) => {
-        console.log("signall!!!1")
+        console.log("signall!!!1");
         socket.emit("callVet", {
           signalData: data,
-          // from: me, i dont think i need it i can just like do socket.id
           name: currentUser.name,
           mongoDbId: currentUser.id, //later will send the token for actual confirmation
         });
