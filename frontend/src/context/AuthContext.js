@@ -18,7 +18,6 @@ export function AuthProvider({ children }) {
         "http://localhost:8080/api/users/signin",
         { email, password }
       );
-
       setCurrentUser(response.data);
       setCurrentUserToken(response.data.token);
       sessionStorage.setItem("token", response.data.token); // Assuming the server responds with a token
@@ -26,15 +25,13 @@ export function AuthProvider({ children }) {
         "Authorization"
       ] = `Bearer ${response.data.token}`;
       window.location.reload();
-      return response.data; // This can be useful to confirm successful login in the calling component
+      return response.data;
     } catch (error) {
-      // Here you can handle errors, for example:
-      // If the API call was unsuccessful, you might want to show an error message
       console.error(
         "Login failed:",
         error.response ? error.response.data : error.message
       );
-      throw error; // Re-throw the error if you want to handle it further up the call stack (e.g., to display an error message in the UI)
+      throw error; 
     }
   }
 
@@ -61,7 +58,6 @@ export function AuthProvider({ children }) {
         email: email,
         isVet: isVet
       };
-  
       setCurrentUser(user); // Set the current user with the user object
       setCurrentUserToken(token); // Set the current user's token
       sessionStorage.setItem("token", token); // Store the token in sessionStorage
@@ -84,14 +80,12 @@ export function AuthProvider({ children }) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
         const response = await axios.get("http://localhost:8080/api/users/me");
-
         setCurrentUserToken(response.data.token);
         setCurrentUser(response.data.user);
       } catch (error) {
         console.error("Failed to load user from token:", error);
         logout();
       } finally { 
-        
         setLoading(false);
       }
     } else {
