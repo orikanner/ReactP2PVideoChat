@@ -3,6 +3,7 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+
 export function useAuth() {
   return useContext(AuthContext);
 }
