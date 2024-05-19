@@ -12,86 +12,68 @@ export function AuthProvider({ children }) {
   const [currentUserToken, setCurrentUserToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function login(email, password) {
+  const api = axios.create({
+    baseURL: "http://localhost:8080/api",
+  });
+
+  const handleAuthSuccess = (data) => {
+    const { token, userId, name, email, isVet } = data;
+    const user = { id: userId, name, email, isVet };
+
+    setCurrentUser(user);
+    setCurrentUserToken(token);
+    sessionStorage.setItem("token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    window.location.reload();
+  };
+
+  const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/users/signin",
-        { email, password }
-      );
-      setCurrentUser(response.data);
-      setCurrentUserToken(response.data.token);
-      sessionStorage.setItem("token", response.data.token); // Assuming the server responds with a token
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
-      window.location.reload();
+      const response = await api.post("/users/signin", { email, password });
+      handleAuthSuccess(response.data);
       return response.data;
     } catch (error) {
-      console.error(
-        "Login failed:",
-        error.response ? error.response.data : error.message
-      );
-      throw error; 
+      console.error("Login failed:", error.response ? error.response.data : error.message);
+      throw error;
     }
-  }
+  };
 
-  function logout() {
+  const logout = () => {
     setCurrentUser(null);
     sessionStorage.removeItem("token");
-    delete axios.defaults.headers.common["Authorization"];
+    delete api.defaults.headers.common["Authorization"];
     window.location.reload();
-  }
+  };
 
-  async function register(emailParam, password, nameParam, isVetParam) {
+  const register = async (email, password, name, isVet) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/users/signup",
-        { email:emailParam, password, name:nameParam, isVet:isVetParam }
-      );
-  
-      // Assuming the response.data.data contains the user details and token
-      const { userId, name, email, isVet, token } = response.data  
-      // Create a user object that includes the necessary details
-      const user = {
-        id: userId,
-        name: name,
-        email: email,
-        isVet: isVet
-      };
-      setCurrentUser(user); // Set the current user with the user object
-      setCurrentUserToken(token); // Set the current user's token
-      sessionStorage.setItem("token", token); // Store the token in sessionStorage
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`; // Set the authorization header for subsequent requests
-      window.location.reload();
-      return response.data; // Return the full response data for further processing if needed
+      const response = await api.post("/users/signup", { email, password, name, isVet });
+      handleAuthSuccess(response.data);
+      return response.data;
     } catch (error) {
-      console.error(
-        "Registration failed:",
-        error.response ? error.response.data : error.message
-      );
-      throw error; // Re-throw the error for handling in UI components
+      console.error("Registration failed:", error.response ? error.response.data : error.message);
+      throw error;
     }
-  }
-  
+  };
 
-  async function loadUserFromToken() {
+  const loadUserFromToken = async () => {
     const token = sessionStorage.getItem("token");
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
-        const response = await axios.get("http://localhost:8080/api/users/me");
+        const response = await api.get("/users/me");
         setCurrentUserToken(response.data.token);
         setCurrentUser(response.data.user);
       } catch (error) {
         console.error("Failed to load user from token:", error);
         logout();
-      } finally { 
+      } finally {
         setLoading(false);
       }
     } else {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     loadUserFromToken();
