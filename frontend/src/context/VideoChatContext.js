@@ -10,17 +10,15 @@ export function useVideoChatContext() {
 }
 
 const socket = io("http://localhost:8080");
+
 const VideoChatProvider = ({ children }) => {
   const { currentUser, currentUserToken } = useAuth();
 
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
-
   const [isReceivingCall, setIsReceivingCall] = useState(false);
-
-  const [callerData, setCallerData] = useState(); //will hold the customer mongoId
+  const [callerData, setCallerData] = useState();
   const [callerSignal, setCallerSignal] = useState();
-
   const [stream, setStream] = useState({});
   const [name, setName] = useState("");
   const [call, setCall] = useState({});
@@ -28,9 +26,8 @@ const VideoChatProvider = ({ children }) => {
 
   const myVideo = useRef();
   const userVideo = useRef();
-
   const connectionRef = useRef();
-  console.log("connectionRef", connectionRef);
+
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -47,20 +44,16 @@ const VideoChatProvider = ({ children }) => {
     if (currentUser && currentUser.isVet) {
       socket.emit("registerVet", { token: currentUserToken });
       socket.on("callFromClient", (data) => {
-        console.log("callFromClient", data);
         setIsReceivingCall(true);
-        setCallerData(data); //callerData type {signalData,fromSocketId,mongoDbId}
+        setCallerData(data);
         setCallerSignal(data.signalData);
-        //here should add the socket id of the user that we got the call from
       });
     }
-  }, []);
+  }, [currentUser, currentUserToken]);
 
-  //Will be used by the Vet
   const answerCall = () => {
     setCallAccepted(true);
     try {
-      console.log("stream before new peer for vet", stream);
       const peer = new Peer({ initiator: false, trickle: false, stream });
       peer.on("signal", (data) => {
         socket.emit("answerCall", {
@@ -77,25 +70,23 @@ const VideoChatProvider = ({ children }) => {
       });
       peer.on("error", (err) => {
         console.error("Peer connection error:", err);
-        leaveCall(); // Ensure cleanup on error
+        leaveCall();
       });
       peer.signal(callerSignal);
       connectionRef.current = peer;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
-  //Will be used by the User
-  const callVet = (id) => {
+  const callVet = () => {
     try {
       const peer = new Peer({ initiator: true, trickle: false, stream });
       peer.on("signal", (data) => {
-        console.log("signall!!!1");
         socket.emit("callVet", {
           signalData: data,
           name: currentUser.name,
-          mongoDbId: currentUser.id, //later will send the token for actual confirmation
+          mongoDbId: currentUser.id,
         });
       });
       peer.on("stream", (currentStream) => {
@@ -103,20 +94,20 @@ const VideoChatProvider = ({ children }) => {
       });
       peer.on("error", (err) => {
         console.error("Peer connection error:", err);
-        leaveCall(); // Ensure cleanup on error
+        leaveCall();
       });
       socket.on("callAccepted", (signal) => {
         setCallAccepted(true);
         peer.signal(signal);
       });
       connectionRef.current = peer;
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  //Will be used by both the User and the Vet
   const leaveCall = () => {
     setCallEnded(true);
-    // connectionRef.current.destroy();
     window.location.reload();
   };
 
@@ -143,4 +134,5 @@ const VideoChatProvider = ({ children }) => {
     </SocketContext.Provider>
   );
 };
+
 export { VideoChatProvider, SocketContext };

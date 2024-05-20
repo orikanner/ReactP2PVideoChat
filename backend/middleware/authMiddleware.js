@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-
+const JWTSECRET = require("../JWTSecret");
 const verifyToken = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1]; // Bearer TOKEN
-        const decoded = jwt.verify(token, '123');
+        const decoded = jwt.verify(token, JWTSECRET);
         req.user = decoded;
         next();
     } catch (error) {

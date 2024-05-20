@@ -1,6 +1,6 @@
 const authService = require("../services/authService");
 const jwt = require('jsonwebtoken');
-
+const JWTSECRET = require("../JWTSecret")
 
 const signup = async (req, res) => {
   console.log(req.body);
@@ -22,7 +22,7 @@ const validToken = async (req, res) => {
     if (!token) throw new Error('Bearer token malformed');
 
     // console.log(token);
-    const decoded = jwt.verify(token, '123'); // Use environment variable for the secret
+    const decoded = jwt.verify(token, JWTSECRET); // Use environment variable for the secret
     // console.log("Decoded:", decoded); // Optionally log decoded token for debugging
 
     // Typically return user data or a success message instead of the token
